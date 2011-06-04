@@ -95,7 +95,16 @@ public class NativeCertificateProvider
 
   public final boolean hasCertificatePrivateKey(X509Certificate paramX509Certificate, String paramString1, String paramString2)
   {
+    System.out.println("Has certificate '" + paramX509Certificate.getSubjectX500Principal().getName() + "' private key?");
     Object localObject;
+    localObject = paramX509Certificate.getIssuerDN().getName();
+    String str;
+    if ((str = paramX509Certificate.getSerialNumber().toString(16).toUpperCase()).length() % 2 == 1)
+      str = "0" + str;
+    if (!(("".equals(paramString2)) || (((String)localObject).equals(paramString2)) || (Utility.getCAFromCertificateDesc((String)localObject).equals(paramString2))) && (("".equals(paramString1)) || (str.equals(paramString1.toUpperCase())) || (Utility.reverse(str).equals(paramString1.toUpperCase())))) {
+    	return false;
+    }
+    
     try
     {
       try
@@ -104,23 +113,28 @@ public class NativeCertificateProvider
           localObject = (PrivateKey)keystore.getKey(keystore.getCertificateAlias(paramX509Certificate), null);
         else
           localObject = (PrivateKey)keystore.getKey(keystore.getCertificateAlias(paramX509Certificate), pass.toCharArray());
+        if (localObject != null) {
+          return true;
+        }
+        else {
+          throw new Exception();
+        }
       }
       catch (Exception localException1)
       {
-        pass = EnterPinDialog.SelectPasswordModal(passwordDialogTitle);
-        localObject = (PrivateKey)keystore.getKey(keystore.getCertificateAlias(paramX509Certificate), pass == null ? null : pass.toCharArray());
+        String newPass = EnterPinDialog.SelectPasswordModal(passwordDialogTitle + "'" + paramX509Certificate.getSubjectX500Principal().getName() + "'");
+        localObject = (PrivateKey)keystore.getKey(keystore.getCertificateAlias(paramX509Certificate), newPass == null ? null : newPass.toCharArray());
         ((PrivateKey)localObject).getAlgorithm();
+        if (localObject != null) {
+          pass = newPass;
+          return true;
+        }
       }
     }
     catch (Exception localException2)
     {
-      return false;
     }
-    localObject = paramX509Certificate.getIssuerDN().getName();
-    String str;
-    if ((str = paramX509Certificate.getSerialNumber().toString(16).toUpperCase()).length() % 2 == 1)
-      str = "0" + str;
-    return (("".equals(paramString2)) || (((String)localObject).equals(paramString2)) || (Utility.getCAFromCertificateDesc((String)localObject).equals(paramString2))) && (("".equals(paramString1)) || (str.equals(paramString1.toUpperCase())) || (Utility.reverse(str).equals(paramString1.toUpperCase())));
+    return false;
   }
 
   public final Key convertToPublicKey(Key paramKey)
@@ -142,8 +156,10 @@ public class NativeCertificateProvider
       {
         String str = (String)localEnumeration.nextElement();
         X509Certificate localX509Certificate = (X509Certificate)keystore.getCertificate(str);
-        if (hasCertificatePrivateKey(localX509Certificate, paramString1, paramString2))
+        if (hasCertificatePrivateKey(localX509Certificate, paramString1, paramString2)) {
+          System.out.println("Adding certificate to the list of found ones: " + localX509Certificate.getSubjectX500Principal().getName());
           ((ArrayList)localObject).add(localX509Certificate);
+        }
       }
       return (X509Certificate[])((ArrayList)localObject).toArray(new X509Certificate[0]);
     }
@@ -231,6 +247,7 @@ public class NativeCertificateProvider
     shortProviderName = "Apple";
     keystore = KeyStore.getInstance("KeychainStore", "Apple");
     isLoaded = true;
+    needPassword = true;
     keystore.load(null, "abc123".toCharArray());
   }
 
