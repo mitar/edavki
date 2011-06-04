@@ -49,6 +49,7 @@ public class NativeCertificateProvider
   private void OpenCertificateStore(String paramString)
     throws ESignDocException
   {
+    Object localObject;
     try
     {
       if (!isLoaded)
@@ -63,7 +64,6 @@ public class NativeCertificateProvider
               localObject = new FileInputStream(inputstreamstore);
             keystore.load((InputStream)localObject, paramString == null ? null : paramString.toCharArray());
             pass = paramString;
-            tmpTernaryOp = localObject;
           }
           catch (Exception localException1)
           {
@@ -72,7 +72,6 @@ public class NativeCertificateProvider
               localFileInputStream = new FileInputStream(inputstreamstore);
             pass = EnterPinDialog.SelectPasswordModal(passwordDialogTitle);
             keystore.load(localFileInputStream, pass == null ? null : pass.toCharArray());
-            tmpTernaryOp = localFileInputStream;
           }
         }
         else
@@ -89,14 +88,14 @@ public class NativeCertificateProvider
     }
     catch (Exception localException2)
     {
-      Object localObject;
-      (localObject = localException2).printStackTrace();
+      localException2.printStackTrace();
       throw new ESignDocException(32, "<CertificateNotFound StoreType=\"" + getShortProviderName() + "\"/>");
     }
   }
 
   public final boolean hasCertificatePrivateKey(X509Certificate paramX509Certificate, String paramString1, String paramString2)
   {
+    Object localObject;
     try
     {
       try
@@ -111,14 +110,13 @@ public class NativeCertificateProvider
         pass = EnterPinDialog.SelectPasswordModal(passwordDialogTitle);
         localObject = (PrivateKey)keystore.getKey(keystore.getCertificateAlias(paramX509Certificate), pass == null ? null : pass.toCharArray());
         ((PrivateKey)localObject).getAlgorithm();
-        tmpTernaryOp = keystore.getCertificateAlias(paramX509Certificate);
       }
     }
     catch (Exception localException2)
     {
       return false;
     }
-    Object localObject = paramX509Certificate.getIssuerDN().getName();
+    localObject = paramX509Certificate.getIssuerDN().getName();
     String str;
     if ((str = paramX509Certificate.getSerialNumber().toString(16).toUpperCase()).length() % 2 == 1)
       str = "0" + str;
@@ -134,6 +132,7 @@ public class NativeCertificateProvider
   public final X509Certificate[] getAllCertificatesWithPrivateKey(String paramString1, String paramString2, char[] paramArrayOfChar)
     throws ESignDocException
   {
+    Object localObject;
     OpenCertificateStore(paramArrayOfChar == null ? null : new String(paramArrayOfChar));
     try
     {
@@ -150,8 +149,7 @@ public class NativeCertificateProvider
     }
     catch (Exception localException)
     {
-      Object localObject;
-      (localObject = localException).printStackTrace();
+      localException.printStackTrace();
     }
     throw new ESignDocException(32, "<CertificateNotFound StoreType=\"" + getShortProviderName() + "\"/>");
   }
@@ -159,6 +157,7 @@ public class NativeCertificateProvider
   public final X509Certificate[] getAllCertificates(String paramString1, String paramString2, char[] paramArrayOfChar)
     throws ESignDocException
   {
+    Object localObject;
     OpenCertificateStore(paramArrayOfChar == null ? null : new String(paramArrayOfChar));
     try
     {
@@ -173,8 +172,7 @@ public class NativeCertificateProvider
     }
     catch (Exception localException)
     {
-      Object localObject;
-      (localObject = localException).printStackTrace();
+      localException.printStackTrace();
     }
     throw new ESignDocException(32, "<CertificateNotFound StoreType=\"" + getShortProviderName() + "\"/>");
   }
@@ -324,12 +322,13 @@ public class NativeCertificateProvider
     try
     {
       localObject1 = null;
-      Object localObject2 = null;
+      String localObject2 = null;
+      PrivateKey localObject4 = null;
       String str1 = paramString1.toUpperCase();
       Enumeration localEnumeration = keystore.aliases();
       while (localEnumeration.hasMoreElements())
       {
-        Object localObject3 = (String)localEnumeration.nextElement();
+        String localObject3 = (String)localEnumeration.nextElement();
         X509Certificate localX509Certificate;
         String str2 = Utility.getHexString((localX509Certificate = (X509Certificate)keystore.getCertificate((String)localObject3)).getSerialNumber()).toUpperCase();
         if (str1.equals(str2))
@@ -348,22 +347,22 @@ public class NativeCertificateProvider
       try
       {
         if (pass == null)
-          localObject3 = (PrivateKey)keystore.getKey(localObject2, null);
+          localObject4 = (PrivateKey)keystore.getKey(localObject2, null);
         else
-          localObject3 = (PrivateKey)keystore.getKey(localObject2, pass.toCharArray());
+          localObject4 = (PrivateKey)keystore.getKey(localObject2, pass.toCharArray());
       }
       catch (Exception localException1)
       {
         pass = EnterPinDialog.SelectPasswordModal(passwordDialogTitle);
-        localObject3 = (PrivateKey)keystore.getKey(localObject2, pass == null ? null : pass.toCharArray());
+        localObject4 = (PrivateKey)keystore.getKey(localObject2, pass == null ? null : pass.toCharArray());
       }
-      return new CertificateHelper((PrivateKey)localObject3, (X509Certificate)localObject1);
+      return new CertificateHelper((PrivateKey)localObject4, (X509Certificate)localObject1);
     }
     catch (Exception localException2)
     {
-      (localObject1 = localException2).printStackTrace();
+      localException2.printStackTrace();
+      throw new ESignDocException(32, localException2.getLocalizedMessage());
     }
-    throw new ESignDocException(32, ((Exception)localObject1).getLocalizedMessage());
   }
 
   public String getProviderName()
@@ -394,8 +393,8 @@ public class NativeCertificateProvider
     }
     catch (Exception localException)
     {
+      throw new ESignDocException(3, "Error accessing certificate store", localException);
     }
-    throw new ESignDocException(3, "Error accessing certificate store", localException);
   }
 
   public static class ReflectionHelper
@@ -439,13 +438,13 @@ public class NativeCertificateProvider
         PasswordCallback localPasswordCallback = (PasswordCallback)localCallback;
         try
         {
-          NativeCertificateProvider.access$002(EnterPinDialog.SelectPasswordModal(this.prompt));
+          NativeCertificateProvider.pass = EnterPinDialog.SelectPasswordModal(this.prompt);
         }
         catch (ESignDocException localESignDocException2)
         {
           ESignDocException localESignDocException1;
           (localESignDocException1 = localESignDocException2).printStackTrace();
-          NativeCertificateProvider.access$002(null);
+          NativeCertificateProvider.pass = null;
         }
         if (NativeCertificateProvider.pass == null)
           continue;
