@@ -5,8 +5,11 @@
 // @include        https://edavki.durs.si/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js
 // ==/UserScript==
-var applet = $('#signingApplet').clone();
+var applet = $('#signingApplet').clone(true);
 $('#signingApplet').remove();
+$('param[name="storetype"]', applet).attr({
+    'value': 'NATIVE'
+});
 applet.attr({
     'codebase': 'https://common.tnode.com/edavki/'
-}).insertAfter('#objectContainer');
+}).appendTo('#objectContainer');
