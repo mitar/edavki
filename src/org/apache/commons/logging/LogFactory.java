@@ -179,16 +179,15 @@ public abstract class LogFactory
       catch (InvocationTargetException localInvocationTargetException2)
       {
         if (!((localInvocationTargetException1 = localInvocationTargetException2).getTargetException() instanceof SecurityException))
-          break label71;
+        	throw new LogConfigurationException("Unexpected InvocationTargetException", localInvocationTargetException1.getTargetException());
       }
-      break label114;
-      label71: throw new LogConfigurationException("Unexpected InvocationTargetException", localInvocationTargetException1.getTargetException());
+      return localClassLoader;
     }
     catch (NoSuchMethodException localNoSuchMethodException)
     {
       localClassLoader = LogFactory.class.getClassLoader();
     }
-    label114: return localClassLoader;
+    return localClassLoader;
   }
 
   private static LogFactory getCachedFactory(ClassLoader paramClassLoader)

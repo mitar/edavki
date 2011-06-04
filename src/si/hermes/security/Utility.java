@@ -948,7 +948,6 @@ public final class Utility
       if (paramString != null)
       {
         localObject1 = localByteArrayOutputStream.toString(paramString);
-        jsr 26;
       }
       localObject1 = localByteArrayOutputStream.toString();
     }

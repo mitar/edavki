@@ -294,7 +294,6 @@ public final class ESignDocImpl extends PersistableImpl
       if ((localInputStream = ESignDocImpl.class.getResourceAsStream("/si/hermes/security/resource/SebBuildVersion.xml")) == null)
       {
         System.out.println("warning: version info not found!");
-        jsr 148;
       }
       DocumentBuilderFactoryImpl localDocumentBuilderFactoryImpl;
       DocumentBuilder localDocumentBuilder;

@@ -259,7 +259,7 @@ public final class DigSigLoader
       return null;
     }
 
-    DigSigPrefixResolver(DigSigLoader.1 param1)
+    DigSigPrefixResolver(DigSigLoader param1)
     {
       this();
     }

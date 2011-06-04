@@ -113,7 +113,6 @@ public class LogSource
       try
       {
         setLogImplementation(str);
-        return;
       }
       catch (Throwable localThrowable4)
       {
@@ -123,7 +122,6 @@ public class LogSource
         }
         catch (Throwable localThrowable5)
         {
-          return;
         }
       }
     else
@@ -140,7 +138,6 @@ public class LogSource
         else
         {
           setLogImplementation("org.apache.commons.logging.impl.NoOpLog");
-          return;
         }
       }
       catch (Throwable localThrowable6)
@@ -148,7 +145,6 @@ public class LogSource
         try
         {
           setLogImplementation("org.apache.commons.logging.impl.NoOpLog");
-          return;
         }
         catch (Throwable localThrowable7)
         {
